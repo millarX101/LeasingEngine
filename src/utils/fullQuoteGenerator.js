@@ -26,6 +26,7 @@ export function generateFullQuote(raw, runningOverride = null) {
     termYears : +raw.termYears
   };
 
+  console.log("QUOTE INPUTS", raw);
   const {
     state, price, isEV, carType,
     kms, salary, termYears, payCycle

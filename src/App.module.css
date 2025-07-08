@@ -1,0 +1,95 @@
+/* App.module.css */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px;
+  font-family: Avenir, sans-serif;
+}
+
+.logoHeader {
+  color: #8435D3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  height: 30px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+input, select {
+  width: 100%;
+  padding: 6px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.primaryBtn {
+  background: #8435D3;
+  color: white;
+}
+
+.secondaryBtn {
+  background: #444;
+  color: white;
+  margin-top: 20px;
+}
+
+.quoteCard {
+  background: white;
+  padding: 30px;
+  margin-bottom: 40px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.quoteHeader {
+  color: #8435D3;
+}
+
+.quotePrice {
+  font-size: 2rem;
+}
+
+.financeBox, .runningBox {
+  flex: 1;
+  padding: 20px;
+  border-radius: 8px;
+  color: white;
+}
+
+.financeBox {
+  background: #8435D3;
+}
+
+.runningBox {
+  background: #FF8C00;
+}
+
+.quoteBoxes {
+  display: flex;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.quoteImg {
+  width: 100%;
+  margin-top: 20px;
+  border-radius: 8px;
+}

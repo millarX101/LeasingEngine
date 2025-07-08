@@ -1,0 +1,85 @@
+// src/utils/fullQuoteGenerator.js
+
+import { PAY_CYCLES }                 from "./config.js";
+import { calculateStampDuty }        from "./stampDutyCalculator.js";
+import { calculateRunningCosts }     from "./runningCosts.js";
+import { calculateRego }             from "./regoCalculator.js";
+import { calculateInsurance }        from "./insuranceCalculator.js";
+import { calculateFinance }          from "./financeCalculator.js";
+import { calculateAllUpRate }        from "./allUpRateCalculator.js";
+import { calculateIncomeTaxSavings } from "./taxCalculator.js";
+
+/**
+ * Generate a complete novated lease quote.
+ * 
+ * @param {object} raw - Raw form input
+ * @param {object|null} runningOverride - Optional annual running costs from API
+ * @returns {object} Quote result for UI
+ */
+export function generateFullQuote(raw, runningOverride = null) {
+  // ---------- Coerce numeric inputs ----------
+  const params = {
+    ...raw,
+    price     : +raw.price,
+    kms       : +raw.kms,
+    salary    : +raw.salary,
+    termYears : +raw.termYears
+  };
+
+  const {
+    state, price, isEV, carType,
+    kms, salary, termYears, payCycle
+  } = params;
+
+  // ---------- Up-front costs ----------
+  const stampDuty = calculateStampDuty(state, price, isEV);
+  const rego      = calculateRego(state); // ✅ fixed to pass state
+  const insurance = calculateInsurance(carType);
+
+  // ---------- Running costs (can override) ----------
+  const runAnnual = runningOverride || calculateRunningCosts(carType, kms);
+
+  // Add rego and insurance to running costs
+  runAnnual.rego = rego;
+  runAnnual.insurance = insurance;
+  runAnnual.total += rego + insurance;
+
+  // ---------- Finance calculations ----------
+  const finance = calculateFinance(price, stampDuty, rego, termYears);
+  finance.allUpRate = calculateAllUpRate(
+    finance.amountFinanced,
+    finance.monthlyPayment,
+    finance.balloon,
+    finance.termMonths
+  );
+
+  // ---------- Totals ----------
+  const annualFinance = finance.monthlyPayment * 12;
+  const annualTotal   = annualFinance + runAnnual.total;
+
+  // ---------- ECM logic ----------
+  const ecmAnnual = isEV ? 0 : ((price - rego - stampDuty) * 0.20);
+  const taxableBaseAnnual = annualTotal - ecmAnnual;
+
+  const taxSavedAnnual = calculateIncomeTaxSavings(salary, taxableBaseAnnual);
+
+  // ---------- Payment frequency ----------
+  const divisor = PAY_CYCLES[payCycle] ?? 12;
+
+  const runningPerCycle = Object.fromEntries(
+    Object.entries(runAnnual).map(([k, v]) => [k, v / divisor])
+  );
+
+  // ---------- Key Outputs ----------
+  const leasePerCycle = annualTotal / divisor;
+  const taxPerCycle   = taxSavedAnnual / divisor;
+  const oopPerCycle   = leasePerCycle - taxPerCycle;
+
+  return {
+    finance,
+    running : runningPerCycle,
+    leasePerCycle,
+    taxPerCycle,
+    oopPerCycle
+  };
+}

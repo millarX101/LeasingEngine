@@ -1,0 +1,208 @@
+import React, { useState } from "react";
+import { generateFullQuote } from "./utils/fullQuoteGenerator";
+import QuoteDropdowns from "./QuoteDropdowns";
+import { v4 as uuidv4 } from "uuid";
+
+const millarxPurple = "#8435D3";
+
+export default function App() {
+  const [formData, setFormData] = useState({
+    clientName: "", clientEmail: "",
+    make: "", model: "", year: "", trim: "",
+    state: "VIC", isEV: false, carType: "",
+    price: 0, salary: 0, kms: 15000,
+    termYears: 5, payCycle: "Monthly",
+    ecm: "Employee Contribution Method",
+    businessUsePercent: 0
+  });
+
+  const [quotes, setQuotes] = useState([]);
+
+  const generateQuoteID = () => {
+    const today = new Date();
+    const dateStr = today.toISOString().split("T")[0].replace(/-/g, "");
+    const serial = quotes.length + 1;
+    return `Q-${dateStr}-${String(serial).padStart(3, '0')}`;
+  };
+
+  const handleChange = ({ target }) => {
+    const { name, value, type } = target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === "number" ? +value || 0 : value
+    }));
+  };
+
+  const handleDropdown = fields =>
+    setFormData(prev => ({ ...prev, ...fields }));
+
+  const handleGenerateQuote = async () => {
+    const { make, model, year, kms } = formData;
+    const query = new URLSearchParams({ make, model, year, annualKms: kms });
+
+    try {
+      const res = await fetch(`http://localhost:4000/api/details?${query}`);
+      if (!res.ok) throw new Error("API error");
+
+      const { carType, isEV, runningCosts } = await res.json();
+      const fullForm = { ...formData, carType, isEV };
+      const quoteData = generateFullQuote(fullForm, runningCosts);
+
+      const quoteEntry = {
+        id: uuidv4(),
+        quoteRef: generateQuoteID(),
+        data: fullForm,
+        quote: quoteData,
+        imageUrl: `https://source.unsplash.com/featured/?${make},${model},car`,
+        selected: false
+      };
+
+      setQuotes(prev => [...prev, quoteEntry]);
+    } catch (err) {
+      console.error("❌ Vehicle info fetch error:", err);
+      alert("Could not get car details. Please check Make/Model/Year.");
+    }
+  };
+
+  const toggleSelection = id => {
+    setQuotes(prev =>
+      prev.map(q => (q.id === id ? { ...q, selected: !q.selected } : q))
+    );
+  };
+
+  const handlePrintSelectedQuotes = () => {
+    const selected = quotes.filter(q => q.selected);
+    if (!selected.length) return alert("No quotes selected to print.");
+
+    const win = window.open("", "_blank", "width=1000,height=700");
+    const content = selected.map(q => `
+      <div style="page-break-after: always; font-family: Arial, sans-serif;">
+        <h2 style="color: ${millarxPurple}; margin-bottom: 5px;">${q.data.termYears}-Year Quote | ${q.quoteRef}</h2>
+        <p>${q.data.clientName} | ${q.data.clientEmail}</p>
+        <h1 style="font-size: 2.2rem;">$${q.quote.oopPerCycle?.toFixed(2)} / ${q.data.payCycle.toLowerCase()}</h1>
+        <div style="display: flex; gap: 30px; margin-top: 20px;">
+          <div style="flex: 1; background: ${millarxPurple}; color: white; padding: 20px; border-radius: 8px;">
+            <h3>Finance</h3>
+            <p>Financed: $${q.quote.finance?.amountFinanced?.toFixed(2)}</p>
+            <p>Payment: $${q.quote.finance?.monthlyPayment?.toFixed(2)}</p>
+            <p>Balloon: $${q.quote.finance?.balloon?.toFixed(2)}</p>
+            <p>Fee: $31.90 + GST</p>
+          </div>
+          <div style="flex: 1; background: #FF8C00; color: white; padding: 20px; border-radius: 8px;">
+            <h3>Running Costs</h3>
+            ${Object.entries(q.quote.running).filter(([k]) => k !== "total").map(
+              ([k, v]) => `<p>${k}: $${v.toFixed(2)}</p>`
+            ).join("")}
+          </div>
+        </div>
+        <img src="${q.imageUrl}" alt="Car" style="width: 100%; margin-top: 20px; border-radius: 8px;" />
+      </div>
+    `).join("");
+
+    win.document.write(`<html><head><title>millarX Quotes</title></head><body>${content}</body></html>`);
+    win.document.close();
+    win.focus();
+    win.print();
+  };
+
+  return (
+    <div style={{ maxWidth: 1100, margin: "0 auto", padding: 20, fontFamily: "Arial, sans-serif" }}>
+      <h1 style={{ color: millarxPurple }}>
+        <img src="/assets/millarx-logo.png" alt="millarX" style={{ height: 30, marginRight: 10 }} />
+        millarX Novated Lease Quotes
+      </h1>
+
+      {/* --- Client Info & Quote Input --- */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 10 }}>
+        <label>Client Name<input name="clientName" value={formData.clientName} onChange={handleChange} /></label>
+        <label>Client Email<input name="clientEmail" value={formData.clientEmail} onChange={handleChange} /></label>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
+        <QuoteDropdowns make={formData.make} model={formData.model} year={formData.year} onChange={handleDropdown} />
+        <label>Variant<input name="trim" value={formData.trim} onChange={handleChange} /></label>
+        <label>On-Road Sale Price<input name="price" type="number" value={formData.price} onChange={handleChange} /></label>
+        <label>Annual Salary<input name="salary" type="number" value={formData.salary} onChange={handleChange} /></label>
+        <label>Annual KMs<input name="kms" type="number" value={formData.kms} onChange={handleChange} /></label>
+        <label>Term
+          <select name="termYears" value={formData.termYears} onChange={handleChange}>
+            {[1, 2, 3, 4, 5].map(y => <option key={y} value={y}>{y} Year</option>)}
+          </select>
+        </label>
+        <label>Pay Cycle
+          <select name="payCycle" value={formData.payCycle} onChange={handleChange}>
+            {["Weekly", "Fortnightly", "Monthly"].map(p => <option key={p} value={p}>{p}</option>)}
+          </select>
+        </label>
+        <label>FBT Method
+          <select name="ecm" value={formData.ecm} onChange={handleChange}>
+            {["Employee Contribution Method", "Operating Cost Method"].map(opt => (
+              <option key={opt} value={opt}>{opt}</option>
+            ))}
+          </select>
+        </label>
+        {formData.ecm === "Operating Cost Method" && (
+          <label>Business Use %<input name="businessUsePercent" type="number" min="0" max="100"
+            value={formData.businessUsePercent} onChange={handleChange} /></label>
+        )}
+      </div>
+
+      <button onClick={handleGenerateQuote} style={{
+        marginTop: 20, background: millarxPurple, color: "white",
+        padding: "10px 20px", border: "none", borderRadius: 5
+      }}>
+        Generate Quote
+      </button>
+
+      {/* --- Print Selected --- */}
+      <div style={{ marginTop: 40 }}>
+        <button onClick={handlePrintSelectedQuotes} style={{
+          background: "#222", color: "white",
+          padding: "10px 20px", border: "none", borderRadius: 5
+        }}>
+          Print Selected Quotes to PDF
+        </button>
+      </div>
+
+      {/* --- Stacked Quotes --- */}
+      <div style={{ marginTop: 30 }}>
+        {quotes.map(q => (
+          <div key={q.id} style={{
+            background: "#fff", padding: 25, marginBottom: 30,
+            borderRadius: 10, boxShadow: "0 0 8px rgba(0,0,0,0.1)"
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <h2 style={{ color: millarxPurple }}>
+                {q.data.termYears}-Year Quote | {q.quoteRef}
+              </h2>
+              <label>
+                <input type="checkbox" checked={q.selected} onChange={() => toggleSelection(q.id)} /> Include in PDF
+              </label>
+            </div>
+            <p>{q.data.clientName} | {q.data.clientEmail}</p>
+            <h1 style={{ fontSize: "2rem" }}>
+              ${q.quote.oopPerCycle?.toFixed(2)} / {q.data.payCycle.toLowerCase()}
+            </h1>
+
+            <div style={{ display: "flex", gap: 30, marginTop: 20 }}>
+              <div style={{ flex: 1, background: millarxPurple, color: "white", padding: 20, borderRadius: 8 }}>
+                <h3>Finance</h3>
+                <p>Financed: ${q.quote.finance?.amountFinanced?.toFixed(2)}</p>
+                <p>Payment: ${q.quote.finance?.monthlyPayment?.toFixed(2)}</p>
+                <p>Balloon: ${q.quote.finance?.balloon?.toFixed(2)}</p>
+                <p>Fee: $31.90 + GST</p>
+              </div>
+              <div style={{ flex: 1, background: "#FF8C00", color: "white", padding: 20, borderRadius: 8 }}>
+                <h3>Running Costs</h3>
+                {q.quote.running && Object.entries(q.quote.running).filter(([k]) => k !== "total").map(([k, v]) =>
+                  <p key={k}>{k}: ${v.toFixed(2)}</p>
+                )}
+              </div>
+            </div>
+            {q.imageUrl && <img src={q.imageUrl} alt="Car" style={{ width: "100%", marginTop: 20, borderRadius: 8 }} />}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

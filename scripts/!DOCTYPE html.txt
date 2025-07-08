@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>millarX Novated Lease Quote</title>
+<style>
+  :root{
+    --mx-purple:#8435D3;
+    --mx-orange:#ff8c00;
+    --page-padding:24px;
+    --card-radius:10px;
+    --card-shadow:0 2px 8px rgba(0,0,0,.12);
+    --font: 'Segoe UI', Arial, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:var(--font);
+    color:#112;
+    background:#f8f8f8;
+    padding:var(--page-padding);
+  }
+  header{
+    display:flex;
+    align-items:center;
+    margin-bottom:24px;
+  }
+  header img{
+    height:38px;
+    margin-right:12px;
+  }
+  h2.section{
+    margin:32px 0 8px;
+    font-size:1.35rem;
+    color:var(--mx-purple);
+  }
+  /* ------------- hero ------------- */
+  .hero{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    background:#fff;
+    border-radius:var(--card-radius);
+    box-shadow:var(--card-shadow);
+    padding:24px;
+  }
+  .hero-cost{
+    flex:1 1 260px;
+  }
+  .hero-cost h1{
+    font-size:3rem;
+    color:var(--mx-purple);
+  }
+  .hero-cost small{display:block;color:#555;margin-top:4px;font-style:italic}
+  .hero-img{
+    flex:1 1 260px;
+    text-align:right;
+  }
+  .hero-img img{
+    max-width:100%;
+    height:auto;
+    border-radius:var(--card-radius);
+    max-height:180px;
+  }
+  /* ------------- real impact ------------- */
+  .impact{
+    display:flex;
+    gap:16px;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+  .impact-card{
+    flex:1 1 200px;
+    background:#fff;
+    border-radius:var(--card-radius);
+    box-shadow:var(--card-shadow);
+    padding:20px;
+  }
+  .impact-card h3{font-size:1rem;color:#222;margin-bottom:8px}
+  .impact-card p{font-size:1.1rem;margin:4px 0}
+  .impact-card p span{font-weight:600}
+  /* ------------- finance vs running ------------- */
+  .grid-two{
+    display:flex;
+    gap:24px;
+    flex-wrap:wrap;
+    margin-top:24px;
+  }
+  .card{
+    flex:1 1 260px;
+    border-radius:var(--card-radius);
+    color:#fff;
+    padding:20px;
+  }
+  .card ul{list-style:none;margin-top:8px}
+  .card li{margin:4px 0;font-size:0.95rem}
+  .finance{background:var(--mx-purple);}
+  .running{background:var(--mx-orange);}
+  .running li span{float:right}
+  /* ------------- print tweaks ------------- */
+  @media print{
+    body{background:#fff;padding:12mm}
+    header,button{display:none}
+    .hero, .impact-card, .card{box-shadow:none}
+    .grid-two{gap:12px}
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ---------- Header ---------- -->
+<header>
+  <img src="YOUR_MILLARX_LOGO.svg" alt="millarX logo">
+  <div>
+    <h1 style="font-size:1.6rem;font-weight:600;color:var(--mx-purple);">Novated Lease Quote</h1>
+    <div style="font-size:0.9rem;color:#666;">Quote&nbsp;Ref&nbsp;Q-20250625-001</div>
+  </div>
+</header>
+
+<!-- ---------- HERO SECTION ---------- -->
+<section class="hero">
+  <div class="hero-cost">
+    <h1>$&nbsp;850<span style="font-size:1.25rem;"> /pay</span></h1>
+    <small>Estimated out-of-pocket after tax benefits</small>
+  </div>
+  <div class="hero-img">
+    <!-- replace with generated image url -->
+    <img src="https://source.unsplash.com/featured/?family%20SUV%20car" alt="Vehicle">
+  </div>
+</section>
+
+<!-- ---------- REAL IMPACT ---------- -->
+<h2 class="section">Real Impact</h2>
+<div class="impact">
+  <div class="impact-card">
+    <h3>Normal take-home pay</h3>
+    <p><span>$3,000</span> /pay</p>
+  </div>
+  <div class="impact-card">
+    <h3>Take-home after lease</h3>
+    <p><span>$2,150</span> /pay</p>
+  </div>
+  <div class="impact-card">
+    <h3>Difference (your cost)</h3>
+    <p><span>$850</span> /pay</p>
+  </div>
+</div>
+
+<!-- ---------- FINANCE & RUNNING COSTS ---------- -->
+<div class="grid-two">
+  <!-- finance card -->
+  <div class="card finance">
+    <h3>Finance&nbsp;&amp;&nbsp;Fees</h3>
+    <ul>
+      <li>Finance&nbsp;Payments&nbsp;:&nbsp;$750&nbsp;/mth</li>
+      <li>Packaging&nbsp;Fee&nbsp;:&nbsp;$29&nbsp;+&nbsp;GST</li>
+      <li>Effective&nbsp;Rate&nbsp;:&nbsp;6.75%&nbsp;pa</li>
+      <li>Balloon&nbsp;:&nbsp;$14,500</li>
+    </ul>
+  </div>
+
+  <!-- running card -->
+  <div class="card running">
+    <h3>Running&nbsp;Costs</h3>
+    <ul>
+      <li>Fuel / Charge <span>$120</span></li>
+      <li>Rego <span>$75</span></li>
+      <li>Insurance <span>$160</span></li>
+      <li>Servicing <span>$60</span></li>
+      <li>Tyres <span>$35</span></li>
+    </ul>
+    <hr style="border:0;border-top:1px solid rgba(255,255,255,.4);margin:8px 0">
+    <strong style="font-size:1.1rem;">Total&nbsp;Running&nbsp;Costs&nbsp;$455&nbsp;/mth</strong>
+  </div>
+</div>
+
+<!-- ---------- FOOTER / SIGNATURE ---------- -->
+<div style="margin-top:40px;font-size:0.9rem;color:#555;">
+  <p><strong>Terms&nbsp;&amp;&nbsp;Conditions</strong></p>
+  <p>Employee&nbsp;Signature:&nbsp;____________________</p>
+  <p>Employer&nbsp;Signature:&nbsp;___________________&nbsp;&nbsp;&nbsp;Date&nbsp;_________</p>
+  <p style="margin-top:8px;font-size:0.8rem;">
+    Indicative only, subject to credit approval and employer participation. All figures include GST where applicable.
+  </p>
+</div>
+
+<!-- ---------- PRINT BUTTON (remove or hook into app) ---------- -->
+<button onclick="window.print()" style="
+  margin-top:32px;
+  padding:12px 24px;
+  border:none;
+  border-radius:6px;
+  background:var(--mx-purple);
+  color:#fff;
+  cursor:pointer;
+">Print / Save as PDF</button>
+
+</body>
+</html>

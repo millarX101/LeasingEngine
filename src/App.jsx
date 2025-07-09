@@ -96,8 +96,8 @@ export default function App() {
         <section className="bg-white p-8 rounded-2xl shadow space-y-6">
           {/* Contact + State */}
           <div className="grid md:grid-cols-2 gap-6">
-            <TextInput label="Client Name" name="clientName" value={formData.clientName} onChange={handleChange} />
-            <TextInput label="Client Email" name="clientEmail" value={formData.clientEmail} onChange={handleChange} />
+            <TextInput label="Your Name" name="clientName" value={formData.clientName} onChange={handleChange} />
+            <TextInput label="Your Email" name="clientEmail" value={formData.clientEmail} onChange={handleChange} />
             <SelectInput label="State" name="state" value={formData.state} onChange={handleChange}
               options={["VIC", "NSW", "QLD", "SA", "WA", "TAS", "ACT", "NT"]} />
           </div>

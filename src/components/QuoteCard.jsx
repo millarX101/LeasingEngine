@@ -32,8 +32,10 @@ export default function QuoteCard({ q }) {
 
   return (
     <div
-      id={`quote-${q.id}`}
-      className="bg-white rounded-2xl shadow-lg p-8 space-y-6 text-gray-800 print:shadow-none print:rounded-none print:p-10"
+    id={`quote-${q.id}`}
+    className="bg-white rounded-2xl shadow-lg p-8 space-y-6
+               text-gray-800 print:shadow-none print:rounded-none
+               print:p-10 print:break-after-page">   {/* 👈 keeps card on 1 A4 */}
     >
       {/* 📸 Car Image */}
       {q.imageUrl && (

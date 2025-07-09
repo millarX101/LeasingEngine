@@ -1,7 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config();
-
-const OPENAI_API_KEY = process.env.VITE_OPENAI_API_KEY;
+const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 export async function generateCarSceneImage(make, model, carType = "") {
   if (!OPENAI_API_KEY) {
@@ -16,14 +13,14 @@ export async function generateCarSceneImage(make, model, carType = "") {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENAI_API_KEY}`
+        "Authorization": `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
         model: "dall-e-3",
         prompt,
         n: 1,
-        size: "1024x1024"
-      })
+        size: "1024x1024",
+      }),
     });
 
     if (!response.ok) {

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { generateFullQuote } from "./utils/fullQuoteGenerator";
-import { generateCarSceneImage } from "./utils/carImageGenerator";
 import QuoteCard from "./components/QuoteCard";
 import QuoteDropdowns from "./QuoteDropdowns";
 

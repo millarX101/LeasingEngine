@@ -1,8 +1,8 @@
 // src/utils/config.js
 export const GST_CAP          = 63_340;   // ATO motor-vehicle cap (ex-GST)
 export const ESTABLISHMENT_FEE = 500;
-export const BASE_RATE         = 0.0685;   // 6.95 % p.a.
-export const BROKERAGE_RATE    = 0.04;     // 4 % of NAF
+export const BASE_RATE         = 0.0620;   // 6.95 % p.a.
+export const BROKERAGE_RATE    = 0.03;     // 4 % of NAF
 export const DEFERRAL_MONTHS   = 2;
 
 export const BALLOON_PERCENTS = { 1:0.6563, 2:0.5625, 3:0.4688, 4:0.3750, 5:0.2813 };

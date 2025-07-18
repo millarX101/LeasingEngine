@@ -1,0 +1,4 @@
+[functions.quote]
+enabled    = true
+import_map = "./functions/quote/deno.json"
+entrypoint = "./functions/quote/index.ts"

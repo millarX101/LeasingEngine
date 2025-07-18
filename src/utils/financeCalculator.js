@@ -1,16 +1,19 @@
 // src/utils/financeCalculator.js
-import { GST_CAP, ESTABLISHMENT_FEE, BASE_RATE,
+import { GST_CAP, ESTABLISHMENT_FEE, TERM_RATES,
          BROKERAGE_RATE, DEFERRAL_MONTHS,
          BALLOON_PERCENTS } from "./config.js";
 
 export function calculateFinance(price, stamp, rego, termYears) {
-  const termMonths   = termYears*12;
-  const monthlyRate  = BASE_RATE/12;
+  const termMonths   = termYears * 12;
+  
+  // Use tiered rate based on term
+  const baseRate = TERM_RATES[termYears] || TERM_RATES[5]; // Default to 5-year rate if term not found
+  const monthlyRate  = baseRate / 12;
 
   const baseVehicle  = price - stamp - rego;
-  const gstExBase    = baseVehicle/1.1;
-  const gstOnCar     = baseVehicle-gstExBase;
-  const claimableGST = Math.min(gstOnCar, GST_CAP*0.1);
+  const gstExBase    = baseVehicle / 1.1;
+  const gstOnCar     = baseVehicle - gstExBase;
+  const claimableGST = Math.min(gstOnCar, GST_CAP * 0.1);
   const gstNonClaim  = gstOnCar - claimableGST;
 
   const naf          = gstExBase + gstNonClaim + stamp + rego + ESTABLISHMENT_FEE;
@@ -20,17 +23,19 @@ export function calculateFinance(price, stamp, rego, termYears) {
   const amountFin    = naf + brokerage;
 
   // add deferred interest
-  const principalInt = amountFin * (1+monthlyRate)**DEFERRAL_MONTHS;
+  const principalInt = amountFin * Math.pow(1 + monthlyRate, DEFERRAL_MONTHS);
 
   const repayments   = termMonths - DEFERRAL_MONTHS;
-  const factor       = (1+monthlyRate)**repayments;
-  const monthlyPmt   = (principalInt*monthlyRate - balloon*monthlyRate/factor) / (1-1/factor);
+  const factor       = Math.pow(1 + monthlyRate, repayments);
+  const monthlyPmt   = (principalInt * monthlyRate - balloon * monthlyRate / factor) / (1 - 1/factor);
 
   return {
     amountFinanced    : amountFin,
     monthlyPayment    : monthlyPmt,
     balloon,
     brokerage,
-    termMonths
+    termMonths,
+    baseRate,          // Include the rate used
+    naf               // Add NAF to the return
   };
 }
